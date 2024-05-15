@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <script src="text.js"></script>
+    <script src="script1.js"></script>
+    <script src="mqtt.min.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        header {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            /*width: 100vh;*/
+        }
+
+        header ul {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0;
+            margin: 0;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden; /* чтобы скрыть часть закругленных углов */
+        }
+
+        header ul li {
+            text-align: left;
+            padding: 0px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2); /* добавим разделительные линии */
+            color: #000000;
+            font-size: 16px;
+        }
+
+        header ul li:last-child {
+            border-bottom: none; /* убираем нижнюю линию у последнего элемента */
+        }
+
+        nav {
+            background-color: #444;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+            cursor: pointer; /* Добавляем свойство cursor */
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #ffcc00;
+        }
+
+        .content {
+            padding: 20px;
+            /*text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            flex-direction: row;*/
+
+
+            /*text-align: center;*/
+            /*display: flex;*/
+            /*justify-content: space-between;*/
+            /*flex-direction: column-reverse;*/
+            /*flex-wrap: nowrap;*/
+            /*align-items: baseline;*/
+
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: flex-start;
+        }
+
+        .content ul {
+            text-align: left;
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .content ul li {
+            padding: 10px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+            color: #000000;
+            font-size: 16px;
+        }
+
+        .content ul li:last-child {
+            border-bottom: none;
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Стили для контейнера формы */
+        .container {
+            /*position: absolute;*/
+            /*background-color: red;*/
+            margin: 20px auto; /* Центрирование по горизонтали */
+            padding: 20px;
+            background-color: #ffffff; /* Белый фон */
+            border-radius: 20px; /* Закругленные углы */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Небольшая тень */
+        }
+
+        #control_panel_container {
+            /* Стили для текстового поля */
+            /*top: 545px;*/
+
+            textarea {
+                width: calc(100% - 40px); /* 100% ширина минус два отступа по 20px */
+                padding: 15px;
+                margin-bottom: 20px;
+                border: 2px solid #222222;
+                border-radius: 10px; /* Закругленные углы */
+                background-color: #f5f5f5; /* Светло-серый фон */
+                font-size: 16px;
+                /*resize: none;*/
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Небольшая тень */
+            }
+
+            /* Стили для кнопок */
+
+            /* Стили для кнопок */
+            button {
+                display: inline-block;
+                padding: 10px 20px;
+                margin: 10px 5px 0 0;
+                border: none;
+                border-radius: 5px; /* Закругленные углы */
+                background-color: #4CAF50; /* Зеленый цвет кнопки */
+                color: white;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s; /* Плавное изменение цвета фона */
+            }
+
+            button:hover {
+                background-color: #45a049; /* Темно-зеленый цвет при наведении */
+            }
+
+            button:active {
+                background-color: #3e8e41; /* Еще более темный зеленый цвет при нажатии */
+            }
+
+        }
+
+        #settings_container {
+            /*width: 1000px;*/
+
+            /* Стили для поля ввода */
+            input[type="text"],
+            input[type="checkbox"] {
+                width: calc(100% - 40px); /* Ширина минус два отступа по 20px */
+                padding: 10px;
+                margin-bottom: 10px;
+                border: none;
+                border-radius: 5px; /* Закругленные углы */
+                background-color: #f5f5f5; /* Светло-серый фон */
+                font-size: 16px;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Небольшая тень */
+            }
+
+            /* Стили для заголовка */
+            legend {
+                font-size: 20px;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+
+            /* Стили для меток */
+            label {
+                display: block;
+                margin-bottom: 5px;
+            }
+
+
+        }
+
+
+        /* Стили для модального окна */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Стили для содержимого модального окна */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; /* Центрирование по вертикали и горизонтали с небольшим отступом */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%; /* Уменьшил ширину контента */
+            max-width: 400px; /* Максимальная ширина контента */
+            border-radius: 10px; /* Закругленные углы */
+            text-align: center;
+        }
+        .modal-content .headers {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center
+        }
+
+        .modal-content .headers select {
+            width: fit-content;
+        }
+
+        /* Стили для кнопки закрытия модального окна */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+
+        .led {
+            width: 25px;
+            height: 10px;
+            border: 1px solid #000;
+            background-color: rgb(218, 208, 208);
+            /* начальный цвет (например, красный) */
+        }
+
+        /* Media Queries */
+        @media only screen and (max-width: 600px) {
+            footer {
+                position: relative;
+            }
+            .content {
+                padding: 20px;
+
+                /*text-align: center;*/
+                /*display: flex;*/
+                /*align-items: center;*/
+                /*justify-content: space-around;*/
+                /*flex-direction: row;*/
+
+
+                text-align: center;
+                display: flex;
+                justify-content: space-between;
+                flex-direction: column-reverse;
+                flex-wrap: nowrap;
+                align-items: baseline;
+
+                /*padding: 20px;*/
+                /*text-align: center;*/
+                /*display: flex;*/
+                /*justify-content: space-between;*/
+                /*flex-direction: row;*/
+                /*flex-wrap: nowrap;*/
+                /*align-items: flex-start;*/
+            }
+            form {
+                /*max-width: 90%;*/
+            }
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0, 0, 0, 0.5);
+            }
+
+            .modal-content {
+                background-color: #fefefe;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                padding: 20px;
+                border: 1px solid #888;
+                max-width: 400px;
+                border-radius: 10px;
+                text-align: center;
+            }
+
+
+        }
+
+        /* Стили для спиннера */
+        .spinner {
+            border: 8px solid #f3f3f3;
+            /* Светлая рамка */
+            border-top: 8px solid #3498db;
+            /* Синяя рамка */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            /* Анимация вращения */
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -25px;
+            /* Смещение по горизонтали на половину ширины спиннера */
+            margin-top: -25px;
+            /* Смещение по вертикали на половину высоты спиннера */
+        }
+
+        /* Анимация вращения */
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>MagicButton service</h1>
+    <div id="led" class="led"></div>
+</header>
+
+<nav>
+    <ul id="nav_list">
+        <li><a id="btn_change_lang"></a></li>
+        <li><a id="control_header"></a></li>
+        <li><a id="greeting"></a></li>
+    </ul>
+</nav>
+
+<div class="content">
+    <div class="details">
+        <ul>
+            <li><h3 id="usrCNT"><span id="userCount">0</span></h3></li>
+            <li><h3 id="usrQNT"><span id="totalUsers">0</span></h3></li>
+            <li><h3 id="gsmLevel"><span id="signalLevel">0</span></h3></li>
+            <li><h3 id="adminPh"><span id="adminPhone">0</span></h3></li>
+        </ul>
+    </div>
+
+
+    <div class="container" id="control_panel_container">
+        <form id="phoneForm">
+            <textarea id="phone" name="phone" rows="4" required></textarea>
+            <br>
+            <button type="button" onclick="isPresentNumber()" id="manual_is"></button>
+            <button type="button" onclick="addPhoneNumber()" id="manual_add"></button>
+            <button type="button" onclick="deletePhoneNumber()" id="manual_del"></button>
+            <button type="button" onclick="addFromFile()" id="add_from_file"></button>
+            <button type="button" onclick="deleteFromFile()" id="del_from_file"></button>
+            <button type="button" onclick="deleteAllRecords()" id="del_all"></button>
+            <button type="button" onclick="makeBackup()" id="backup"></button>
+            <button type="button" onclick="restoreBackup()" id="restore"></button>
+            <button type="button" onclick="reset_fnc()" id="rst_btn"></button>
+        </form>
+    </div>
+
+    <div class="container" id="settings_container" style="display: none;">
+        <form method="post" action="/settings.html" onsubmit="submitForm(event)" id="mqqt_set">
+            <fieldset>
+                <legend id="mqtt_legend"></legend>
+                <label id="mqtt_secure_label"></label>
+                <input type="checkbox" id="MQTT_SECURE"/>
+                <br>
+                <br>
+                <label id="file_en"></label>
+                <input type="checkbox" id="FILE_OUT"/>
+                <br>
+                <br>
+                <label id="L_DEV_PASSWORD"></label>
+                <input type="text" id="DEVICE_PASSWORD"/>
+                <label id="L_MQTT_LOGIN"></label>
+                <input type="text" id="MQTT_LOGIN"/>
+                <label id="L_MQTT_PASSWORD"></label>
+                <input type="text" id="MQTT_PASSWORD"/>
+                <label id="L_MQTT_SERVER"></label>
+                <input type="text" id="MQTT_SERVER"/>
+                <label id="L_MQTT_CLIENT_ID"></label>
+                <input type="text" id="MQTT_CLIENT_ID"/>
+                <label id="L_MQTT_TOPIC_NAME"></label>
+                <input type="text" id="MQTT_TOPIC_NAME"/>
+                <label id="L_MQTT_PORT"></label>
+                <input type="text" id="MQTT_PORT"/>
+            </fieldset>
+        </form>
+    </div>
+
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="headers">
+                <p id="hdr_choose_lang"></p>
+<!--                <ul>-->
+                    <select id="lang">
+                        <option value="en">English</option>
+                        <option value="uk">Українська</option>
+                        <option value="de">Deutsch</option>
+                        <option value="ru">Русский</option>
+                    </select>
+<!--                </ul>-->
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<div style="height: 70px"> </div>
+<footer>
+    <p>© 2024 magicbutton. All rights reserved.</p>
+</footer>
+
+<!-- Модальное окно -->
+<div id="myModal" class="modal">
+    <!-- Спиннер -->
+    <div class="spinner"></div>
+</div>
+<script>
+    function loadPage() {
+        setLanguage(mqttSettings["lang"]);
+        updateForm(mqttSettings);
+
+
+        // Получаем ссылку на форму
+        form = document.getElementById('mqqt_set');
+
+        if (form !== null) {
+            // Создаем обработчик события для формы
+            form.addEventListener('change', function (event) {
+                readForm();
+                localStorage.setItem('mqttSettings', JSON.stringify(mqttSettings));
+            });
+        }
+        //пытаемся коннектится
+        connectReconnect2MqttServer();
+        hideLoadingIndicator();
+    }
+
+    function toggleContainer(containerId) {
+        const container = document.getElementById(containerId);
+        if (container.style.display === "none") {
+            const allContainers = document.getElementsByClassName("container");
+            for (let i = 0; i < allContainers.length; i++) {
+                const currentContainer = allContainers.item(i);
+                if (currentContainer.id === containerId) {
+                    currentContainer.style.display = "block";
+                    continue;
+                }
+                currentContainer.style.display = "none";
+            }
+        }
+    }
+
+    function openModal() {
+        document.getElementById('modal').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    window.onclick = function (event) {
+        // Закрыть модальное окно при клике на область вне его
+        const modal = document.getElementById('modal');
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+
+        const changeLangButton = document.getElementById("btn_change_lang");
+        if (event.target == changeLangButton) {
+            openModal();
+        }
+
+        const control_panel = document.getElementById("control_header");
+        if (event.target == control_panel) {
+            toggleContainer("control_panel_container");
+        }
+
+        const settings = document.getElementById("greeting");
+        if (event.target == settings) {
+            toggleContainer("settings_container");
+        }
+    }
+
+    window.addEventListener('touchend', function(event) {
+        const modal = document.getElementById('modal');
+        if (!modal.contains(event.target)) {
+            modal.style.display = "none";
+        }
+
+        const changeLangButton = document.getElementById("btn_change_lang");
+        if (changeLangButton.contains(event.target)) {
+            openModal();
+        }
+
+        const control_panel = document.getElementById("control_header");
+        if (control_panel.contains(event.target)) {
+            toggleContainer("control_panel_container");
+        }
+
+        const settings = document.getElementById("greeting");
+        if (settings.contains(event.target)) {
+            toggleContainer("settings_container");
+        }
+    });
+
+
+    const selectElement = document.getElementById('lang');
+    selectElement.addEventListener('change', function (event) {
+        readForm();
+        localStorage.setItem('mqttSettings', JSON.stringify(mqttSettings));
+        setLanguage(selectElement.value);
+    });
+
+</script>
+</body>
+</html>
