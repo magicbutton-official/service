@@ -142,6 +142,7 @@
             /*background-color: red;*/
             margin: 20px auto; /* Центрирование по горизонтали */
             padding: 20px;
+            margin-left: 10px;
             background-color: #ffffff; /* Белый фон */
             border-radius: 20px; /* Закругленные углы */
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Небольшая тень */
@@ -400,21 +401,25 @@
     </div>
 
 
-    <div class="container" id="control_panel_container">
-        <form id="phoneForm">
-            <textarea id="phone" name="phone" rows="4" required></textarea>
-            <br>
-            <button type="button" onclick="isPresentNumber()" id="manual_is"></button>
-            <button type="button" onclick="addPhoneNumber()" id="manual_add"></button>
-            <button type="button" onclick="deletePhoneNumber()" id="manual_del"></button>
-            <button type="button" onclick="addFromFile()" id="add_from_file"></button>
-            <button type="button" onclick="deleteFromFile()" id="del_from_file"></button>
-            <button type="button" onclick="deleteAllRecords()" id="del_all"></button>
-            <button type="button" onclick="makeBackup()" id="backup"></button>
-            <button type="button" onclick="restoreBackup()" id="restore"></button>
-            <button type="button" onclick="reset_fnc()" id="rst_btn"></button>
-        </form>
+    <div>
+        <h2 id="control_header" style="position: relative"></h2>
+        <div class="container" id="control_panel_container">
+            <form id="phoneForm">
+                <textarea id="phone" name="phone" rows="4" required></textarea>
+                <br>
+                <button type="button" onclick="isPresentNumber()" id="manual_is"></button>
+                <button type="button" onclick="addPhoneNumber()" id="manual_add"></button>
+                <button type="button" onclick="deletePhoneNumber()" id="manual_del"></button>
+                <button type="button" onclick="addFromFile()" id="add_from_file"></button>
+                <button type="button" onclick="deleteFromFile()" id="del_from_file"></button>
+                <button type="button" onclick="deleteAllRecords()" id="del_all"></button>
+                <button type="button" onclick="makeBackup()" id="backup"></button>
+                <button type="button" onclick="restoreBackup()" id="restore"></button>
+                <button type="button" onclick="reset_fnc()" id="rst_btn"></button>
+            </form>
+        </div>
     </div>
+
 
     <div class="container" id="settings_container" style="display: none;">
         <form method="post" action="/settings.html" onsubmit="submitForm(event)" id="mqqt_set">
